@@ -17,13 +17,14 @@ def get_sources(filepath)
   end.to_set
 end
 
-# run takes in a string of files seperated by spaces, compiles, runs, and
-# deletes the tmpdir
+# run takes in an array of filepaths(to source files), compiles, runs, and
+# deletes the executables and the temp directories
 def run(files)
-  puts "Compiling #{files}..."
+  filenames = files.map { |file| File.basename(file) }
+  puts "Compiling #{filenames * ' '}..."
   Dir.mktmpdir('rucppy') do |dir|
-    compile_command = "g++ #{files} -o #{dir}/a.out"
-    puts compile_command
+    compile_command = "g++ #{files * ' '} -o #{dir}/a.out"
+    # puts compile_command
     `#{compile_command}`
     system("#{dir}/a.out")
   end
@@ -46,7 +47,4 @@ while (filepath = queue.pop) && !filepath.nil?
   get_sources(filepath).each { |filename| queue << filename }
 end
 
-files = ''
-lookup.each { |file| files += "#{file} " }
-
-run(files)
+run(lookup.to_a)
