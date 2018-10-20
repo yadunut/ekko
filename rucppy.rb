@@ -36,22 +36,14 @@ end
 
 MAIN_FILE = File.realpath(ARGV[0])
 
-queue = Queue.new
-queue.push MAIN_FILE
+queue = [MAIN_FILE]
 lookup = Set[]
 
-loop do
-  begin
-    source = queue.pop(true)
+while (filepath = queue.pop) && !filepath.nil?
+  next if lookup.include? filepath
 
-    next if lookup.include? source
-
-    lookup.add source
-    new_sources = get_sources(source)
-    new_sources.each { |filename| queue << filename }
-  rescue ThreadError
-    break
-  end
+  lookup.add filepath
+  get_sources(filepath).each { |filename| queue << filename }
 end
 
 files = ''
