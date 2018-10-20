@@ -3,25 +3,22 @@
 require 'set'
 require 'tmpdir'
 
-def get_sources(filename)
-  content = File.read(filename, mode: 'r')
+# get_sources takes in the filepath to a file and returns a Set of source files
+# by reading the #include statements in the given file
+def get_sources(filepath)
+  content = File.read(filepath, mode: 'r')
   headers = content.scan(/^#include\ \"(.*?)\"$/m).map { |header| header[0] }
+  file_dir = File.dirname(filepath)
   headers.map do |header|
-    source = File.path("#{PROJECT_DIR}/#{header.gsub(/.h$/, '.cpp')}")
+    source = File.path("#{file_dir}/#{header.gsub(/.h$/, '.cpp')}")
     raise "File #{source} does not exist" unless File.exist? source
 
     source
   end.to_set
 end
 
-# def run(files)
-# puts "Compiling #{files}..."
-# Dir.mkdir('bin') unless Dir.exist?('bin')
-# `g++ #{files} -o bin/a.out`
-# system('bin/a.out')
-# File.delete('bin/a.out')
-# end
-
+# run takes in a string of files seperated by spaces, compiles, runs, and
+# deletes the tmpdir
 def run(files)
   puts "Compiling #{files}..."
   Dir.mktmpdir('rucppy') do |dir|
@@ -38,7 +35,6 @@ if ARGV.count.zero?
 end
 
 MAIN_FILE = File.realpath(ARGV[0])
-PROJECT_DIR = File.dirname(MAIN_FILE)
 
 queue = Queue.new
 queue.push MAIN_FILE
@@ -46,7 +42,7 @@ lookup = Set[]
 
 loop do
   begin
-    source = queue.pop(non_block = true)
+    source = queue.pop(true)
 
     next if lookup.include? source
 
