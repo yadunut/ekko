@@ -7,7 +7,7 @@ require 'tmpdir'
 # by reading the #include statements in the given file
 def get_sources(filepath)
   content = File.read(filepath, mode: 'r')
-  headers = content.scan(/^#include\ \"(.*?)\"$/m).map { |header| header[0] }
+  headers = content.scan(/^#include\ \"(.*?)\"/m).map { |header| header[0] }
   file_dir = File.dirname(filepath)
   headers.map do |header|
     source = File.path("#{file_dir}/#{header.gsub(/.h$/, '.cpp')}")
