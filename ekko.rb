@@ -27,7 +27,7 @@ def run(files)
   filenames = files.map { |file| File.basename(file) }
   puts "Compiling #{filenames * ' '}..."
   Dir.mktmpdir('rucppy') do |dir|
-    compile_command = "g++ #{files * ' '} -o #{dir}/a.out"
+    compile_command = "g++ -std=c++11 #{files * ' '} -o #{dir}/a.out"
     # puts compile_command
     `#{compile_command}`
     system("#{dir}/a.out")
@@ -46,7 +46,6 @@ lookup = Set[]
 
 while (filepath = queue.pop) && !filepath.nil?
   next if lookup.include? filepath
-
   lookup.add filepath
   puts filepath
   get_sources(filepath).each { |filename| queue << filename }
